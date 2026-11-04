@@ -1,7 +1,7 @@
 const userModel = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
+const blacklistTokenModel = require("../models/blacklist.model");
 /**
  * @name registerUserController
  * @description This route is used to register a new user
@@ -76,7 +76,39 @@ async function loginUserController(req, res) {
 }
 
 /***
- * @
+ * @name logoutUserController
+ * @description This route is used to logout a user
+ * @access Public
+ */
+async function logoutUserController(req, res) {
+    const token = req.cookies.token;
+  if (token) {
+    await blacklistTokenModel.create({ token });
+   
+  } 
+  res.clearCookie("token");
+    res.status(200).json({ message: "Logout successful" });
+}
+/***
+ * @name getMeController
+ * @description This route is used to get the current logged in user details
+ * @access Private
  */
 
-module.exports = { registerUserController, loginUserController };
+async function getMeController(req, res) {
+
+    const user = await userModel.findById(req.user.id);
+     res.status(200).json({ 
+        message: "User details fetched successfully",
+        user:{
+        id: user._id,
+        username: user.username,
+        email: user.email
+        }
+    })
+     
+
+
+}
+
+module.exports = { registerUserController, loginUserController, logoutUserController, getMeController };
