@@ -47,15 +47,22 @@ export const useAuth = () => {
     }
 
 
-        useEffect(() => {
-          const getAndSetUser = async () => {
-            const data = await getMe();
-            setUser(data.user);
-            setLoading(false);
-          };
+     useEffect(() => {
+       const getAndSetUser = async () => {
+         try {
+           const data = await getMe();
+           setUser(data.user);
+         } catch (err) {
+           // 401 in incognito is normal: it just means nobody is logged in yet
+           setUser(null);
+         } finally {
+           // This will ALWAYS run, turning off the loading screen
+           setLoading(false);
+         }
+       };
 
-          getAndSetUser();
-        }, []);
+       getAndSetUser();
+     }, []);
 
     return {
         user,
