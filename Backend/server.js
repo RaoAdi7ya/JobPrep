@@ -2,13 +2,18 @@ const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
 const app = require("./src/app");
 const connectToDB = require("./src/config/database");
-const invokeGemininAi = require("./src/services/ai.service");
-
+const { resume, selfDescription, jobDescription } = require("./src/services/temp")
+const  generateInterviewReport  = require("./src/services/ai.service")
 connectToDB()
 
-invokeGemininAi()
-  .then((result) => console.log("Gemini test successful"))
-  .catch((error) => console.error("Gemini test failed"));
+generateInterviewReport({ resume, selfDescription, jobDescription })
+  .then((report) => {
+    console.log("AI Report:", JSON.stringify(report, null, 2));
+  })
+  .catch((err) => {
+    console.error("Failed to generate report:", err.message);
+  });
+
 app.listen(3000, () =>{
     console.log("server is running on port 3000")
 
